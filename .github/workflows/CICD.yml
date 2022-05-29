@@ -74,11 +74,15 @@ jobs:
       - name: Build
         run: dotnet build --no-restore          
       - name: Run Snyk to check for vulnerabilities
+        continue-on-error: true
         uses: snyk/actions/dotnet@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --file=TheWorkBook.Identity.sln --severity-threshold=high          
+          args: --file=TheWorkBook.Identity.sln --severity-threshold=high --sarif-file-output=snyk.sarif
+      - uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: snyk.sarif
 
   prepare-release:
     name: Prepare Release (get version from tag)
